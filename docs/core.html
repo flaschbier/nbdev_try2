@@ -94,6 +94,12 @@ description: "Give it another try."
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="A-Little-Database">A Little Database<a class="anchor-link" href="#A-Little-Database"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Let's try how to use a database in a way that it will not break CI tests on GitHub...</p>
 
 </div>
@@ -198,29 +204,10 @@ description: "Give it another try."
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;deliberately failing&quot;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># assert 1 == 0, &quot;deliberately failing&quot;</span>
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-7-2e7aeb5b4eb5&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span><span class="ansi-green-fg">assert</span> <span class="ansi-cyan-fg">1</span> <span class="ansi-blue-fg">==</span> <span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">&#34;deliberately failing&#34;</span>
-
-<span class="ansi-red-fg">AssertionError</span>: deliberately failing</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -238,6 +225,88 @@ description: "Give it another try."
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Cool, <a href="https://github.com/flaschbier/nbdev_try2/runs/543541993">in GitHub it fails</a> properly. But this is even worse, when "tests" run locally but fail in CI.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now it also fails locally. What kind of ordering mess due to the context change Jupyter vs. shell is now going on? On the other hand we see that at least a small file is possible in GitHub CI.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Bah, it "sometimes" requires saving. But this will create a checkpoint also, which is not wanted. Here the design flaws fully strike back.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Findings:</p>
+<ul>
+<li>GitHub CI allows for (at least small) file system consumption</li>
+<li>all cells not markes are treated as tests</li>
+<li>saving required to make the shell tools aware of souce code changes</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Now-For-Requests">Now For Requests<a class="anchor-link" href="#Now-For-Requests"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>FTP will be added soon, no worries...</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">})</span>
+<span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+<span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;https://httpbin.org/get&#39;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{&#39;args&#39;: {}, &#39;headers&#39;: {&#39;Accept&#39;: &#39;application/json&#39;, &#39;Accept-Encoding&#39;: &#39;gzip, deflate&#39;, &#39;Host&#39;: &#39;httpbin.org&#39;, &#39;User-Agent&#39;: &#39;python-requests/2.21.0&#39;, &#39;X-Amzn-Trace-Id&#39;: &#39;Root=1-5e80db62-683330dce17be93ca5dc2f70&#39;}, &#39;origin&#39;: &#39;46.5.69.8&#39;, &#39;url&#39;: &#39;https://httpbin.org/get&#39;}
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
 </div>
  
 
